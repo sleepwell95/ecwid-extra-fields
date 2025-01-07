@@ -14,4 +14,4 @@ ec.order.extraFields.wrapping_box_signature = {
 };
 
 window.Ecwid && Ecwid.refreshConfig();
-console.log("Testing if works"); 
+console.log("Hello there!");
