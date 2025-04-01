@@ -22,7 +22,7 @@ fetch("https://api.multiparcels.com/v1/locations", requestOptions)
 
     // Map API data to options array using only the name
     const options = locations.map((location) => ({
-      title: location.name
+      title: location.name + '-' + location.address
     }));
 
     // Assign to extra field
