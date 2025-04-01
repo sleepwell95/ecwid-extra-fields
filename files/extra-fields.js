@@ -3,9 +3,11 @@ window.ec = window.ec || {};
 ec.order = ec.order || {};
 ec.order.extraFields = ec.order.extraFields || {};
 
+
 // Set up request headers
+const BEARER_TOKEN = "Bearer __REPLACE_ME__";
 const myHeaders = new Headers();
-myHeaders.append("Authorization", "Bearer InCerbzptEszbxze6xV340gdd8J3FZhn");
+myHeaders.append("Authorization", BEARER_TOKEN);
 myHeaders.append("Cookie", "apiato=eyJpdiI6IlhLaU5IbG9IQXREM0c4TVc0TjR5dFE9PSIsInZhbHVlIjoiZ1NNS2VleWxxaG8za3BUUjBXdU0yZCs5bytuWHJCeHprMVFaWVAyS245UHhMd0U5SG82Y2FLcXZvWXhSWWRtZSIsIm1hYyI6IjE4YTM5MTUyN2FjYmYwNDg4OTc3MDg2NGM2MmJiNGVlMWYzM2E3NzljMzM1NGIzNjQxNDcyZTFkNzZiNTdiYjIifQ%3D%3D");
 
 const requestOptions = {
