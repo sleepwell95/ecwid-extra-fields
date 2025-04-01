@@ -15,15 +15,16 @@ const requestOptions = {
 };
 
 // Fetch data and populate options
-fetch("https://api.multiparcels.com/v1/locations?limit=0&orderBy=name&sortedBy=desc", requestOptions)
+// Testing with only 50 limit. 
+fetch("https://api.multiparcels.com/v1/locations?limit=50", requestOptions)
   .then((response) => response.json())
   .then((data) => {
     const locations = data.data;
 
     // Map API data to options array using only the name
     const options = locations.map((location) => ({
-      title: `${location.name} - ${location.address}`
-    }));
+      title: `${location.name} - ${location.address} - ${location.city} - ${location.postal_code}`
+    })).sort((a, b) => a.title.localeCompare(b.title));
 
     // Assign to extra field
     ec.order.extraFields.wrapping_box_signature = {
