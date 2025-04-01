@@ -7,8 +7,9 @@ ec.order.extraFields = ec.order.extraFields || {};
 ec.order.extraFields.wrapping_box_signature = {
     'title': 'How should we sign the package?',
     'textPlaceholder': 'Package sign',
-    'type': 'text',
-    'tip': 'We will put a label on a box so the recipient knows who it is from',
+    'type': 'select',
+    'options':{option1,option2,option3},
+    'tip': 'Select a pickup point from the list',
     'required': false,
     'checkoutDisplaySection': 'shipping_methods'
 };
