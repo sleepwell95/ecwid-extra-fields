@@ -1,5 +1,7 @@
-// script.js1/public/modules/object.js
-Object.create(null).Api = {
+
+
+const API = Object.create(null);
+API.api = async () => {
   fetchApi: async () => {
     const headers = new Headers();
     headers.append('Authorization', 'Bearer InCerbzptEszbxze6xV340gdd8J3FZhn');
@@ -17,5 +19,5 @@ Object.create(null).Api = {
       console.error('API Error:', error);
       throw error;
     }
-  },
+  }
 };

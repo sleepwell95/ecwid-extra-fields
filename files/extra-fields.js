@@ -1,4 +1,4 @@
-import { Api } from './public/modules/fetch-points';
+const { API } = require('./public/modules/fetch-points');
 
 // Initialize extra fields
 window.ec = window.ec || {};
@@ -20,9 +20,11 @@ ec.order.extraFields = ec.order.extraFields || {};
 //   .then((result) => console.log(result))
 //   .catch((error) => console.error(error));
 
-// Add a new optional text input 'How should we sign the package?' to shipping address form
-const result = await Api.fetchApi();
-console.log(result);
+
+function fetchApi() {
+    return API.api();
+  }
+  
 ec.order.extraFields.wrapping_box_signature = {
     'title': 'Select a pickup point',
     'textPlaceholder': '',
