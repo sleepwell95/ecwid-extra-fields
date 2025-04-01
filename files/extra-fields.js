@@ -1,11 +1,11 @@
 // Initialize extra fields
-import { apiCall } from 'fetch-points.js';
+// import { apiCall } from 'fetch-points.js';
 
 window.ec = window.ec || {};
 ec.order = ec.order || {};
 ec.order.extraFields = ec.order.extraFields || {};
 
-await apiCall();
+// await apiCall();
 // Add a new optional text input 'How should we sign the package?' to shipping address form
 ec.order.extraFields.wrapping_box_signature = {
     'title': 'Select a pickup point',
