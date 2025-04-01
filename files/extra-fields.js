@@ -1,4 +1,4 @@
-const { API } = require('./public/modules/fetch-points');
+const { API } = require('./public/modules/fetch-points.js');
 
 // Initialize extra fields
 window.ec = window.ec || {};
@@ -24,7 +24,7 @@ ec.order.extraFields = ec.order.extraFields || {};
 function fetchApi() {
     return API.api();
   }
-  
+
 ec.order.extraFields.wrapping_box_signature = {
     'title': 'Select a pickup point',
     'textPlaceholder': '',
