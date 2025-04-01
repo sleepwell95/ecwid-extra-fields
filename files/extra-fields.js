@@ -24,7 +24,7 @@ fetch("https://api.multiparcels.com/v1/locations?limit=50", requestOptions)
     // Map API data to options array using only the name
     const options = locations.map((location) => ({
       title: `${location.name} - ${location.address} - ${location.city} - ${location.postal_code}`
-    })).sort((a, b) => a.title.localeCompare(b.title));
+    })).sort((a, b) => b.title.localeCompare(a.title));
 
     // Assign to extra field
     ec.order.extraFields.wrapping_box_signature = {
