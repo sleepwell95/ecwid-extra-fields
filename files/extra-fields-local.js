@@ -1,5 +1,5 @@
 // Replace placeholder token dynamically
-fetch("/ecwid-module/module.js")
+fetch("/files/extra-fields.js")
   .then(res => res.text())
   .then(script => {
     const realScript = script.replace("__REPLACE_ME__", "InCerbzptEszbxze6xV340gdd8J3FZhn");
