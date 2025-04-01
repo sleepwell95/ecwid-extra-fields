@@ -1,5 +1,5 @@
 // Initialize extra fields
-import { apiCall } from './apiCall';
+import { apiCall } from 'fetch-points.js';
 
 window.ec = window.ec || {};
 ec.order = ec.order || {};
