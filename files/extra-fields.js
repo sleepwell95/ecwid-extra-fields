@@ -15,7 +15,7 @@ const requestOptions = {
 };
 
 // Fetch data and populate options
-fetch("https://api.multiparcels.com/v1/locations?limit=0", requestOptions)
+fetch("https://api.multiparcels.com/v1/locations?limit=0&orderBy=name&sortedBy=desc", requestOptions)
   .then((response) => response.json())
   .then((data) => {
     const locations = data.data;
