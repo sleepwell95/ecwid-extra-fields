@@ -10,8 +10,8 @@ ec.order.extraFields = ec.order.extraFields || {};
 ec.order.extraFields.pickup_point = {
   title: 'Pasirinkite atsiėmimo tašką',
   type: 'select',
-  options: [], // start empty
-  required: false,
+  options: ["Pasirinkite atsiemimo tašką"], // start empty
+  required: true,
   tip: 'Pasirinkite terminalą pagal pristatymo metodą',
   checkoutDisplaySection: 'shipping_methods',
   orderDetailsDisplaySection: 'shipping_info',
@@ -66,10 +66,10 @@ const fetchPickupPoints = () => {
         }
       ];
 
-      console.log("✅ Pickup points loaded and overrides applied");
+      console.log("Pickup points loaded and overrides applied");
       Ecwid.refreshConfig(); // Force re-render with new options
     })
-    .catch(error => console.error("❌ Error fetching pickup points:", error));
+    .catch(error => console.error("Error fetching pickup points:", error));
 };
 
 // === PAGE + CART TRACKING === //
@@ -77,19 +77,19 @@ let currentEcwidPage = null;
 
 // Step 1: Store the page type when loaded
 Ecwid.OnPageLoaded.add((page) => {
-  const allowedPages = ['CHECKOUT', 'checkout_delivery'];
-  console.log("📄 Ecwid page loaded:", page.type);
+  const allowedPages = ['CHECKOUT', 'CHECKOUT_DELIVERY'];
+  console.log("Ecwid page loaded:", page.type);
   currentEcwidPage = page;
 
   if (allowedPages.includes(page.type)) {
-    console.log("🚀 Running pickup logic on:", page.type);
+    console.log("Running pickup logic on:", page.type);
     fetchPickupPoints();
   }
 });
 
 // Step 2: Also react to cart changes while on delivery step
 Ecwid.OnCartChanged.add(() => {
-  if (currentEcwidPage && currentEcwidPage.type === 'checkout_delivery') {
+  if (currentEcwidPage && currentEcwidPage.type === 'CHECKOUT_DELIVERY') {
     console.log("🔄 Cart changed on delivery step, updating pickup options...");
     fetchPickupPoints();
   }
