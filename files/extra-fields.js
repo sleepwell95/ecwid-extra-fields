@@ -67,9 +67,14 @@ const fetchPickupPoints = () => {
         }
       ];
 
-      console.log("Pickup points loaded and overrides applied");
-      Ecwid.refreshConfig(); // Force re-render with new options
-    })
+    // Reset selection to force refresh
+    Ecwid.Cart.setExtraFieldValue('pickup_point', '');
+
+    // ✅ Call refreshConfig *only after overrides are set*
+    console.log("✅ Calling Ecwid.refreshConfig()");
+    console.log("✅ Overrides assigned, refreshing field now...");
+    Ecwid.refreshConfig();
+  })
     .catch(error => console.error("Error fetching pickup points:", error));
 };
 
