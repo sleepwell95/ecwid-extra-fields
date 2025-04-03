@@ -53,7 +53,7 @@ const fetchPickupPoints = () => {
         }))
         .sort((a, b) => a.title.localeCompare(b.title));
 
-      // Update the overrides
+      // Something is not okay with the overrides, need to test with dummy data. 
       ec.order.extraFields.pickup_point.overrides = [
         {
           shippingMethodId: OMNIVA_METHOD_ID,
@@ -100,3 +100,4 @@ Ecwid.OnCartChanged.add(() => {
     fetchPickupPoints();
   }
 });
+
