@@ -4,8 +4,7 @@ const BEARER_TOKEN = "Bearer InCerbzptEszbxze6xV340gdd8J3FZhn";
 const OMNIVA_METHOD_ID = "8451-1735813681330"; // Replace with your real Omniva ID
 const DPD_METHOD_ID = "46669-1736241676382";    // Replace with your real DPD ID
 
-
-// --- STEP 1: Declare empty field early --- //
+// === SETUP: Declare the field early === //
 ec.order = ec.order || {};
 ec.order.extraFields = ec.order.extraFields || {};
 ec.order.extraFields.pickup_point = {
@@ -16,10 +15,10 @@ ec.order.extraFields.pickup_point = {
   tip: 'Pasirinkite terminalą pagal pristatymo metodą',
   checkoutDisplaySection: 'shipping_methods',
   orderDetailsDisplaySection: 'shipping_info',
-  overrides: [] // will be filled after fetch
+  overrides: [] // we'll fill this after fetching
 };
 
-// --- STEP 2: Fetch locations and update the field --- //
+// === FUNCTION: Fetch pickup points and apply overrides === //
 const fetchPickupPoints = () => {
   const headers = new Headers();
   headers.append("Authorization", BEARER_TOKEN);
@@ -35,22 +34,25 @@ const fetchPickupPoints = () => {
     .then(data => {
       const locations = data.data;
 
-      // Prepare courier-specific options
+      // Prepare Omniva options
       const omnivaOptions = locations
         .filter(loc => loc.courier_code === "omniva_lt")
         .map(loc => ({
           title: `${loc.name} - ${loc.address} - ${loc.city}`,
           value: loc.identifier
-        }));
+        }))
+        .sort((a, b) => a.title.localeCompare(b.title));
 
+      // Prepare DPD options
       const dpdOptions = locations
         .filter(loc => loc.courier_code === "dpd_lt")
         .map(loc => ({
           title: `${loc.name} - ${loc.address} - ${loc.city}`,
           value: loc.identifier
-        }));
+        }))
+        .sort((a, b) => a.title.localeCompare(b.title));
 
-      // Update the overrides now that data is ready
+      // Update the overrides
       ec.order.extraFields.pickup_point.overrides = [
         {
           shippingMethodId: OMNIVA_METHOD_ID,
@@ -64,32 +66,31 @@ const fetchPickupPoints = () => {
         }
       ];
 
-      // This tells Ecwid to update the UI
-      Ecwid.refreshConfig();
+      console.log("✅ Pickup points loaded and overrides applied");
+      Ecwid.refreshConfig(); // Force re-render with new options
     })
-    .catch(error => console.error("Error fetching pickup points:", error));
+    .catch(error => console.error("❌ Error fetching pickup points:", error));
 };
 
+// === PAGE + CART TRACKING === //
 let currentEcwidPage = null;
 
-// --- STEP 3: Run fetch on CHECKOUT page load ---
+// Step 1: Store the page type when loaded
 Ecwid.OnPageLoaded.add((page) => {
-  const allowedPages = ['CHECKOUT', 'CHECKOUT_DELIVERY']; // Use lowercase for new layout
-  console.log("✅ Ecwid page loaded:", page.type);
+  const allowedPages = ['CHECKOUT', 'checkout_delivery'];
+  console.log("📄 Ecwid page loaded:", page.type);
   currentEcwidPage = page;
 
   if (allowedPages.includes(page.type)) {
-    console.log("🚀 Running pickup point logic on:", page.type);
+    console.log("🚀 Running pickup logic on:", page.type);
     fetchPickupPoints();
   }
 });
 
-// --- Watch for cart changes and re-trigger if on the delivery step ---
+// Step 2: Also react to cart changes while on delivery step
 Ecwid.OnCartChanged.add(() => {
-  if (currentEcwidPage && currentEcwidPage.type === 'CHECKOUT_DELIVERY') {
-    console.log("🔄 Cart changed on delivery step, refreshing pickup options...");
+  if (currentEcwidPage && currentEcwidPage.type === 'checkout_delivery') {
+    console.log("🔄 Cart changed on delivery step, updating pickup options...");
     fetchPickupPoints();
   }
 });
-
-
