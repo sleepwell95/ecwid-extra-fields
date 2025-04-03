@@ -1,10 +1,10 @@
 
 // --- CONFIGURATION --- //
 const BEARER_TOKEN = "Bearer InCerbzptEszbxze6xV340gdd8J3FZhn";
-const OMNIVA_METHOD_ID = "8451-1735813681330"; // Replace with real Omniva shipping method ID
-const DPD_METHOD_ID = "46669-1736241676382";    // Replace with real DPD shipping method ID
+const OMNIVA_METHOD_ID = "8451-1735813681330"; // Replace with your real Omniva ID
+const DPD_METHOD_ID = "46669-1736241676382";    // Replace with your real DPD ID
 
-// --- FETCH LOCATIONS AND SET FIELDS --- //
+// --- FETCH LOCATIONS AND SETUP FIELD WITH OVERRIDES --- //
 const fetchPickupPoints = () => {
   const headers = new Headers();
   headers.append("Authorization", BEARER_TOKEN);
@@ -20,11 +20,11 @@ const fetchPickupPoints = () => {
     .then(data => {
       const locations = data.data;
 
-      // Filter by courier code
+      // Filter options
       const omnivaOptions = locations
         .filter(loc => loc.courier_code === "omniva_lt")
         .map(loc => ({
-          title: `${loc.name} - ${loc.address} - ${loc.city} - ${loc.postal_code}`,
+          title: `${loc.name} - ${loc.address} - ${loc.city}`,
           value: loc.identifier
         }))
         .sort((a, b) => a.title.localeCompare(b.title));
@@ -32,33 +32,38 @@ const fetchPickupPoints = () => {
       const dpdOptions = locations
         .filter(loc => loc.courier_code === "dpd_lt")
         .map(loc => ({
-          title: `${loc.name} - ${loc.address} - ${loc.city} - ${loc.postal_code}`,
+          title: `${loc.name} - ${loc.address} - ${loc.city}`,
           value: loc.identifier
         }))
         .sort((a, b) => a.title.localeCompare(b.title));
 
-      // Define extra fields with showForShippingMethodIds
+      // Setup the extra field with overrides
       ec.order = ec.order || {};
       ec.order.extraFields = ec.order.extraFields || {};
 
-      ec.order.extraFields.omniva_pickup = {
-        title: 'Pasirinkite Omniva paštomatą',
+      ec.order.extraFields.pickup_point = {
+        title: 'Pasirinkite atsiėmimo tašką',
         type: 'select',
-        options: omnivaOptions,
+        tip: 'Pasirinkite terminalą pagal pristatymo metodą',
         required: false,
         checkoutDisplaySection: 'shipping_methods',
         orderDetailsDisplaySection: 'shipping_info',
-        showForShippingMethodIds: [OMNIVA_METHOD_ID]
-      };
 
-      ec.order.extraFields.dpd_pickup = {
-        title: 'Pasirinkite DPD paštomatą',
-        type: 'select',
-        options: dpdOptions,
-        required: false,
-        checkoutDisplaySection: 'shipping_methods',
-        orderDetailsDisplaySection: 'shipping_info',
-        showForShippingMethodIds: [DPD_METHOD_ID]
+        // This will be the default if no override matches
+        options: [],
+
+        overrides: [
+          {
+            shippingMethodId: OMNIVA_METHOD_ID,
+            options: omnivaOptions,
+            tip: 'Omniva paštomatai'
+          },
+          {
+            shippingMethodId: DPD_METHOD_ID,
+            options: dpdOptions,
+            tip: 'DPD paštomatai'
+          }
+        ]
       };
 
       // Apply changes
@@ -67,9 +72,10 @@ const fetchPickupPoints = () => {
     .catch(error => console.error("Error fetching pickup points:", error));
 };
 
-// --- INITIALIZE ON CHECKOUT PAGE --- //
+// --- INITIALIZE --- //
 Ecwid.OnPageLoaded.add((page) => {
   if (page.type === 'CHECKOUT') {
     fetchPickupPoints();
   }
 });
+
