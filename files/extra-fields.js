@@ -70,19 +70,26 @@ const fetchPickupPoints = () => {
     .catch(error => console.error("Error fetching pickup points:", error));
 };
 
-// --- STEP 3: Run fetch on CHECKOUT page load --- //
+let currentEcwidPage = null;
+
+// --- STEP 3: Run fetch on CHECKOUT page load ---
 Ecwid.OnPageLoaded.add((page) => {
-  const allowedPages = ['CHECKOUT', 'CHECKOUT_DELIVERY']; // legacy + new
+  const allowedPages = ['CHECKOUT', 'CHECKOUT_DELIVERY']; // Use lowercase for new layout
+  console.log("✅ Ecwid page loaded:", page.type);
+  currentEcwidPage = page;
+
   if (allowedPages.includes(page.type)) {
-    console.log("✅ Running pickup logic on:", page.type);
+    console.log("🚀 Running pickup point logic on:", page.type);
     fetchPickupPoints();
   }
 });
 
+// --- Watch for cart changes and re-trigger if on the delivery step ---
 Ecwid.OnCartChanged.add(() => {
-  const currentPage = Ecwid.getCurrentPage();
-  if (currentPage.type === 'CHECKOUT_DELIVERY') {
-    fetchPickupPoints(); // refresh options if needed
+  if (currentEcwidPage && currentEcwidPage.type === 'CHECKOUT_DELIVERY') {
+    console.log("🔄 Cart changed on delivery step, refreshing pickup options...");
+    fetchPickupPoints();
   }
 });
+
 
