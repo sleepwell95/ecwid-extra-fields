@@ -2,7 +2,7 @@
 // --- CONFIGURATION --- //
 const BEARER_TOKEN = "Bearer InCerbzptEszbxze6xV340gdd8J3FZhn";
 const OMNIVA_METHOD_ID = '8451-1735813681330'; // Replace with your real Omniva ID
-const DPD_METHOD_ID = '46669-1736241676382';    // Replace with your real DPD ID
+const LP_METHOD_ID = '46669-1736241676382';    // Replace with your real DPD ID
 
 // === SETUP: Declare the field early === //
 ec.order = ec.order || {};
@@ -45,8 +45,8 @@ const fetchPickupPoints = () => {
         .sort((a, b) => a.title.localeCompare(b.title));
 
       // Prepare DPD options
-      const dpdOptions = locations
-        .filter(loc => loc.courier_code === "dpd_lt")
+      const lpOptions = locations
+        .filter(loc => loc.courier_code === "lp_express")
         .map(loc => ({
           title: `${loc.name} - ${loc.address} - ${loc.city}`,
           value: loc.identifier
@@ -61,9 +61,9 @@ const fetchPickupPoints = () => {
           tip: 'Omniva paštomatai'
         },
         {
-          shippingMethodId: DPD_METHOD_ID,
-          options: dpdOptions,
-          tip: 'DPD paštomatai'
+          shippingMethodId: LP_METHOD_ID,
+          options: lpOptions,
+          tip: 'LP Express paštomatai'
         }
       ];
 
