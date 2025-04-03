@@ -72,8 +72,17 @@ const fetchPickupPoints = () => {
 
 // --- STEP 3: Run fetch on CHECKOUT page load --- //
 Ecwid.OnPageLoaded.add((page) => {
-  if (page.type === 'CHECKOUT') {
+  const allowedPages = ['CHECKOUT', 'CHECKOUT_DELIVERY']; // legacy + new
+  if (allowedPages.includes(page.type)) {
+    console.log("✅ Running pickup logic on:", page.type);
     fetchPickupPoints();
+  }
+});
+
+Ecwid.OnCartChanged.add(() => {
+  const currentPage = Ecwid.getCurrentPage();
+  if (currentPage.type === 'CHECKOUT_DELIVERY') {
+    fetchPickupPoints(); // refresh options if needed
   }
 });
 
