@@ -68,7 +68,7 @@ const fetchPickupPoints = () => {
       ];
 
     // Reset selection to force refresh
-    Ecwid.Cart.setExtraField('pickup_point', '');
+    // Ecwid.Cart.setExtraField('pickup_point', '');
 
     // ✅ Call refreshConfig *only after overrides are set*
     console.log("✅ Calling Ecwid.refreshConfig()");
