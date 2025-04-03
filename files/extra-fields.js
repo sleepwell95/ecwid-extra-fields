@@ -14,7 +14,6 @@ ec.order.extraFields.pickup_point = {
     'title': 'Pasirinkite atsiemimo tašką'
   }], // start empty
   required: true,
-  tip: 'Pasirinkite terminalą pagal pristatymo metodą',
   checkoutDisplaySection: 'shipping_methods',
   orderDetailsDisplaySection: 'shipping_info',
   overrides: [] // we'll fill this after fetching
