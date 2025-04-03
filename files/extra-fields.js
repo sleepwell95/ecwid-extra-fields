@@ -1,65 +1,75 @@
-// Initialize extra fields
-window.ec = window.ec || {};
-ec.order = ec.order || {};
-ec.order.extraFields = ec.order.extraFields || {};
 
-
-// Set up request headers
+// --- CONFIGURATION --- //
 const BEARER_TOKEN = "Bearer InCerbzptEszbxze6xV340gdd8J3FZhn";
-const myHeaders = new Headers();
-myHeaders.append("Authorization", BEARER_TOKEN);
+const OMNIVA_METHOD_ID = "8451-1735813681330"; // Replace with real Omniva shipping method ID
+const DPD_METHOD_ID = "46669-1736241676382";    // Replace with real DPD shipping method ID
 
-const requestOptions = {
-  method: "GET",
-  headers: myHeaders,
-  redirect: "follow"
+// --- FETCH LOCATIONS AND SET FIELDS --- //
+const fetchPickupPoints = () => {
+  const headers = new Headers();
+  headers.append("Authorization", BEARER_TOKEN);
+
+  const requestOptions = {
+    method: "GET",
+    headers: headers,
+    redirect: "follow"
+  };
+
+  fetch("https://api.multiparcels.com/v1/locations?limit=100", requestOptions)
+    .then(response => response.json())
+    .then(data => {
+      const locations = data.data;
+
+      // Filter by courier code
+      const omnivaOptions = locations
+        .filter(loc => loc.courier_code === "omniva_lt")
+        .map(loc => ({
+          title: `${loc.name} - ${loc.address} - ${loc.city} - ${loc.postal_code}`,
+          value: loc.identifier
+        }))
+        .sort((a, b) => a.title.localeCompare(b.title));
+
+      const dpdOptions = locations
+        .filter(loc => loc.courier_code === "dpd_lt")
+        .map(loc => ({
+          title: `${loc.name} - ${loc.address} - ${loc.city} - ${loc.postal_code}`,
+          value: loc.identifier
+        }))
+        .sort((a, b) => a.title.localeCompare(b.title));
+
+      // Define extra fields with showForShippingMethodIds
+      ec.order = ec.order || {};
+      ec.order.extraFields = ec.order.extraFields || {};
+
+      ec.order.extraFields.omniva_pickup = {
+        title: 'Pasirinkite Omniva paštomatą',
+        type: 'select',
+        options: omnivaOptions,
+        required: false,
+        checkoutDisplaySection: 'shipping_methods',
+        orderDetailsDisplaySection: 'shipping_info',
+        showForShippingMethodIds: [OMNIVA_METHOD_ID]
+      };
+
+      ec.order.extraFields.dpd_pickup = {
+        title: 'Pasirinkite DPD paštomatą',
+        type: 'select',
+        options: dpdOptions,
+        required: false,
+        checkoutDisplaySection: 'shipping_methods',
+        orderDetailsDisplaySection: 'shipping_info',
+        showForShippingMethodIds: [DPD_METHOD_ID]
+      };
+
+      // Apply changes
+      Ecwid.refreshConfig();
+    })
+    .catch(error => console.error("Error fetching pickup points:", error));
 };
 
-// Fetch data and populate options
-// Testing with only 50 limit. 
-fetch("https://api.multiparcels.com/v1/locations?limit=50", requestOptions)
-  .then((response) => response.json())
-  .then((data) => {
-    const locations = data.data;
-
-    // Map API data to options array using only the name
-    const options = locations.map((location) => ({
-      title: `${location.name} -
-       ${location.address} -
-       ${location.city} -
-       ${location.postal_code}`,
-      value: location.identifier,
-      subtitle: location.comment
-    })).sort((a, b) => a.title.localeCompare(b.title));
-
-    // Assign to extra field
-    ec.order.extraFields.wrapping_box_signature = {
-      title: 'Select a pickup point',
-      type: 'select',
-      options: options,
-      tip: 'Select a pickup point from the list',
-      required: false,
-      checkoutDisplaySection: 'shipping_methods',
-      orderDetailsDisplaySection:'shipping_info'
-    };
-
-    // Refresh Ecwid config to apply the new fields
-    window.Ecwid && Ecwid.refreshConfig();
-  })
-  .catch((error) => console.error("API error:", error));
-
-console.log("Fetching pickup points...");
-
-//TODO: 
-//!For tomorrow. 
-//* 1. Save the selected option "values" in Ecwid so it would be possible to pass  
-//* it in the MS. 
-// 2. Override fields when other shipping option is selected. 
-// 2.1. Test it with different info showing in the options menu. Could be dummy info too. 
-// 3. Think of a better way of testing everything. 
-// At the moment to go through entire pipeline and then be able to test is way too long.  
-// 3.1. Possible to test locally? 
-// 4. How to get Shipping options data from Ecwid/MS? 
-// 4.1. With shipping options data we could override options select to correct one's in options.  
-
-
+// --- INITIALIZE ON CHECKOUT PAGE --- //
+Ecwid.OnPageLoaded.add((page) => {
+  if (page.type === 'CHECKOUT') {
+    fetchPickupPoints();
+  }
+});
